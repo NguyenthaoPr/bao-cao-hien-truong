@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "functions": {
+    "api/field_report.py": {"maxDuration": 60, "memory": 1024},
+    "api/field_report_pdf.py": {"maxDuration": 30, "memory": 1024}
+  },
+  "rewrites": [
+    {"source": "/api/field-report", "destination": "/api/field_report.py"},
+    {"source": "/api/field-report-pdf", "destination": "/api/field_report_pdf.py"}
+  ]
+}
