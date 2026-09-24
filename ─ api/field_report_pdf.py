@@ -1,5 +1,3 @@
-from fastapi import FastAPI, UploadFile, File, Form
-from fastapi.responses import Response
 from io import BytesIO
 import os, re, time, html
 from reportlab.lib.pagesizes import A4
@@ -11,7 +9,6 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
-app=FastAPI(title='THỦY LỢI AI - PDF')
 
 PRIMARY=colors.HexColor('#0B4F6C'); ACCENT=colors.HexColor('#1B7A8C'); TEXT=colors.HexColor('#20303B'); MUTED=colors.HexColor('#5A6B75'); LIGHT=colors.HexColor('#EAF2F5')
 ORG='CHI NHÁNH THỦY LỢI VU GIA - THU BỒN'; APP='THỦY LỢI AI'
@@ -70,14 +67,3 @@ def build_pdf(title, answer, image_bytes, reviewer, capture_time, lat, lng, sour
     doc.build(story,onFirstPage=lambda c,d:footer(c,d,title,fr,fb,capture_time),onLaterPages=lambda c,d:footer(c,d,title,fr,fb,capture_time))
     return buf.getvalue()
 
-@app.get('/')
-def health(): return {'success':True,'service':'field-report-pdf'}
-
-@app.post('/')
-async def pdf(report_title:str=Form('BÁO CÁO NHANH HIỆN TRƯỜNG'),answer:str=Form(''),image:UploadFile|None=File(None),reviewer:str=Form(''),capture_time:str=Form(''),latitude:str=Form(''),longitude:str=Form(''),sources_json:str=Form('')):
-    if not answer.strip(): return {'success':False,'error':'Không có nội dung báo cáo để tạo PDF.'}
-    img=await image.read() if image else None
-    try: sources=__import__('json').loads(sources_json) if sources_json else []
-    except Exception: sources=[]
-    data=build_pdf(report_title,answer,img,reviewer,capture_time,latitude,longitude,sources)
-    return Response(content=data,media_type='application/pdf',headers={'Content-Disposition':'attachment; filename="bao-cao-hien-truong.pdf"'})
